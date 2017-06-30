@@ -61,8 +61,7 @@ class LogStash::Filters::Domaincluster < LogStash::Filters::Base
   end # def register
 
   public
-  def filter(event)   
-    
+  def filter(event)     
     if !validate_source
       tag_unsuccessful_lookup(event)  
     else      
