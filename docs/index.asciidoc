@@ -1,0 +1,106 @@
+:plugin: domaincluster
+:type: filter
+
+///////////////////////////////////////////
+START - GENERATED VARIABLES, DO NOT EDIT!
+///////////////////////////////////////////
+:version: %VERSION%
+:release_date: %RELEASE_DATE%
+:changelog_url: %CHANGELOG_URL%
+:include_path: ../../../logstash/docs/include
+///////////////////////////////////////////
+END - GENERATED VARIABLES, DO NOT EDIT!
+///////////////////////////////////////////
+
+[id="plugins-{type}-{plugin}"]
+
+=== DomainCluster
+
+include::{include_path}/plugin_header.asciidoc[]
+
+==== Description
+
+The DomainCluster filter groups Fully-Qualified Domain Names (FQDN) or IP address
+in groups as defined by a set of patterns in a local SQLite database.
+
+The point of such grouping is to give a more "user behavior" comprehensive view of a log,
+by associating groups (or 'clusters') of FQDNs or IP address to a semantic name;
+take the following log line for example:
+
+ 1447860990.048 3 10.0.0.140 TCP_DENIED/403 3668 CONNECT api.twitter.com:443 coj NONE/- text/html
+
+If we specify the `*api.twitter.com*` part of the log as the source field for our plugin,
+the DomainCluster lookup in the database would find a matching pattern, such as `*\.twitter.\*`
+that belongs to cluster "Social Network", which, at the same time, may include
+other patterns such as `*\.facebook\.com$*`.
+
+[NOTE]
+Patterns are unique, and so are groups; on lookup, groups are assigned at first match.
+
+The config should look like this:
+[source,ruby]
+filter {
+  domaincluster {
+    source => "source_field"
+    database => "/var/domaincluster.sqlite"
+  }
+}
+
+[id="plugins-{type}s-{plugin}-options"]
+==== DomainCluster Filter Configuration Options
+
+This plugin supports the following configuration options plus the <<plugins-{type}s-common-options>> described later.
+
+[cols="<,<,<,<",options="header",]
+|=======================================================================
+|Setting |Input type|Required|Default value
+| <<plugins-{type}s-{plugin}-source>> |<<string,string>>|Yes|
+| <<plugins-{type}s-{plugin}-database>> |a valid filesystem path|Yes|
+| <<plugins-{type}s-{plugin}-target>> |<<string,string>>|No|`"domaincluster"`
+| <<plugins-{type}s-{plugin}-tag_on_failure>> |<<array,array>>|No|`["_domaincluster_lookup_failure"]`
+|=======================================================================
+
+Also see <<plugins-{type}s-common-options>> for a list of options supported by all
+filter plugins.
+
+&nbsp;
+
+[id="plugins-{type}s-{plugin}-source"]
+===== `source` 
+
+  * This is a required setting.
+  * Value type is <<string,string>>
+  * There is no default value for this setting.
+
+The field containing the IP address or hostname to group via domaincluster. If
+this field is an array, only the first value will be used.
+
+[id="plugins-{type}s-{plugin}-database"]
+===== `database` 
+  
+  * This is a required setting.
+  * Value type is <<path,path>>
+  * There is no default value for this setting.
+
+The path to `domaincluster.sqlite` database file that Logstash should use. 
+
+[id="plugins-{type}s-{plugin}-target"]
+===== `target` 
+
+  * Value type is <<string,string>>
+  * Default value is `"domaincluster"`
+
+Specify the field into which Logstash should store the domaincluster data.
+This can be useful, for example, if you have `src_ip_hostname` and `dst_ip_hostname` fields and
+would like the domaincluster information of both.
+
+[id="plugins-{type}s-{plugin}-tag_on_failure"]
+===== `tag_on_failure` 
+
+  * Value type is <<array,array>>
+  * Default value is `["_domaincluster_lookup_failure"]`
+
+Tags the event on failure to look up domain information. This can be used in later analysis.
+
+[id="plugins-{type}s-{plugin}-common-options"]
+include::{include_path}/{type}.asciidoc[]
