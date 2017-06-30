@@ -4,7 +4,7 @@ PATH
     logstash-filter-domaincluster (0.1.0)
       jdbc-sqlite3 (~> 3.15)
       logstash-core-plugin-api (~> 2.0)
-      sequel (~> 4.47)
+      sequel (~> 4.0)
 
 GEM
   remote: https://rubygems.org/
@@ -30,7 +30,7 @@ GEM
     jrjackson (0.4.2-java)
     jrmonitor (0.4.2)
     jruby-openssl (0.9.16-java)
-    kramdown (1.13.2)
+    kramdown (1.14.0)
     logstash-core (5.4.0-java)
       chronic_duration (= 0.10.6)
       clamp (~> 0.6.5)
